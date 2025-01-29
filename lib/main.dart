@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:facebook_audience_network/facebook_audience_network.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  FacebookAudienceNetwork.init();
+  runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
