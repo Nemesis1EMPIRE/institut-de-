@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -16,94 +16,82 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: VideoScreen(),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
-class VideoScreen extends StatefulWidget {
-  const VideoScreen({super.key});
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+  final String title;
 
   @override
-  _VideoScreenState createState() => _VideoScreenState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _VideoScreenState extends State<VideoScreen> {
-  final List<String> videoPaths = [
-    'assets/vid/video1.mp4',
-    'assets/vid/video.mp4',
-  ];
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
 
-  late List<VideoPlayerController> _controllers;
-  late List<Future<void>> _initializeControllers;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialisation des contrôleurs vidéo
-    _controllers = videoPaths.map((path) => VideoPlayerController.asset(path)).toList();
-    _initializeControllers = _controllers.map((controller) {
-      return controller.initialize().then((_) {
-        setState(() {}); // 📌 Rafraîchit l'interface après initialisation
-      });
-    }).toList();
-
-    // Activer la lecture automatique en boucle
-    for (var controller in _controllers) {
-      controller.setLooping(true);
-      controller.setVolume(1.0);
-    }
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
   }
 
-  @override
-  void dispose() {
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    super.dispose();
+  void _decrementCounter() {
+    setState(() {
+      if (_counter > 0) _counter--;
+    });
+  }
+
+  void _resetCounter() {
+    setState(() {
+      _counter = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lecteur Vidéo Défilant'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
       ),
-      body: FutureBuilder(
-        future: Future.wait(_initializeControllers), // 📌 Attendre l'initialisation
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return PageView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _controllers.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _controllers[index].value.isPlaying
-                          ? _controllers[index].pause()
-                          : _controllers[index].play();
-                    });
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: _controllers[index].value.aspectRatio,
-                        child: VideoPlayer(_controllers[index]),
-                      ),
-                      if (!_controllers[index].value.isPlaying)
-                        const Icon(Icons.play_circle_fill, size: 80, color: Colors.white),
-                    ],
-                  ),
-                );
-              },
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _decrementCounter,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text("Décrémenter"),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _resetCounter,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  child: const Text("Réinitialiser"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }
