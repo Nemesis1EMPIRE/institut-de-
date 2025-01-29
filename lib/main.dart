@@ -7,7 +7,6 @@ void main() {
   runApp(MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -88,6 +87,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: const Text("Réinitialiser"),
                 ),
               ],
+            ),
+            const SizedBox(height: 20),
+            // Ajoute la bannière Meta Ads ici
+            FacebookBannerAd(
+              placementId: 'YOUR_PLACEMENT_ID', // Remplace par ton placement ID réel
+              bannerSize: BannerSize.BANNER_320_50, // Taille de la bannière
+              listener: (result, value) {
+                print("Banner Ad: $result --> $value");
+              },
             ),
           ],
         ),
